@@ -5,8 +5,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Media;
-using ValorantCC.src;
 using ValorantCC.src.Crosshair;
+
 namespace ValorantCC
 {
     public class Processor
@@ -20,6 +20,7 @@ namespace ValorantCC
         private ProfileList FetchedProfiles;
         public int CurrentProfile;
         private Dictionary<string, string> _headers;
+
         //Haruki's "bug" fix
         private Color[] DefaultColors = new Color[8];
 
@@ -60,7 +61,7 @@ namespace ValorantCC
             if (ProfileListed)
             {
                 SavedProfiles = UserSettings.stringSettings.FirstOrDefault(setting => setting.settingEnum == "EAresStringSettingName::SavedCrosshairProfileData");
-                FetchedProfiles = FetchProfiles(SavedProfiles.value, null, null ,null ,null);
+                FetchedProfiles = FetchProfiles(SavedProfiles.value, null, null, null, null);
             }
             else
             {
@@ -142,13 +143,14 @@ namespace ValorantCC
             {
                 try
                 {
-                    Utilities.Utils.Log("Fetch User Settings failed for WS. Trying playerpref: "+resp.Content.ToString());
-                } catch (NullReferenceException ex)
+                    Utilities.Utils.Log("Fetch User Settings failed for WS. Trying playerpref: " + resp.Content.ToString());
+                }
+                catch (NullReferenceException ex)
                 {
                     Utilities.Utils.Log("WS Failed to fetch settings error: " + ex.StackTrace.ToString());
                 }
 
-                request = new RestRequest("https://playerpreferences.riotgames.com/playerPref/v3/getPreference/Ares.PlayerSettings", Method.Get);
+                request = new RestRequest("https://player-preferences-usw2.pp.sgp.pvp.net/playerPref/v3/getPreference/Ares.PlayerSettings", Method.Get);
                 request.AddHeaders(_headers);
                 resp = await (new RestClient().ExecuteAsync(request));
                 if (!resp.IsSuccessful) return new Data();
@@ -181,7 +183,7 @@ namespace ValorantCC
         private async Task<bool> putUserSettings(Data newData)
         {
             Utilities.Utils.Log("Saving New Data: (BACKUP) " + JsonConvert.SerializeObject(newData));
-            
+
             RestRequest request = new RestRequest($"{AuthResponse.LockfileData.Protocol}://127.0.0.1:{AuthResponse.LockfileData.Port}/player-preferences/v1/data-json/Ares.PlayerSettings", Method.Put);
             request.AddJsonBody(newData);
             RestResponse response = await client.ExecuteAsync(request);
@@ -190,12 +192,13 @@ namespace ValorantCC
                 try
                 {
                     Utilities.Utils.Log("savePreference Unsuccessfull: " + response.Content.ToString());
-                } catch (NullReferenceException ex)
+                }
+                catch (NullReferenceException ex)
                 {
                     Utilities.Utils.Log("WS savePreference Unsuccessfull: " + ex.StackTrace.ToString());
                 }
 
-                request = new RestRequest("https://playerpreferences.riotgames.com/playerPref/v3/savePreference", Method.Put);
+                request = new RestRequest("https://player-preferences-usw2.pp.sgp.pvp.net/playerPref/v3/savePreference", Method.Put);
                 request.AddJsonBody(new { type = "Ares.PlayerSettings", data = Utilities.Utils.Compress(newData) });
                 request.AddHeaders(_headers);
                 response = await (new RestClient().ExecuteAsync(request));
@@ -221,6 +224,7 @@ namespace ValorantCC
         }
 
 #nullable enable
+
         private ProfileList FetchProfiles(string SettingValue, string? PrimOutlineColor, string? ADSColorValue, string? ADSOutlineColor, string? SniperCenterdotColor)
         {
             string DefaultUserSettings = JsonConvert.SerializeObject(UserSettings);
@@ -252,8 +256,8 @@ namespace ValorantCC
                 }
             };
         }
-#nullable disable
 
+#nullable disable
 
         private List<string> FetchProfileNames(ProfileList ProfileList)
         {
@@ -292,6 +296,7 @@ namespace ValorantCC
                 UserSettings = CrosshairMain.ChangeInActiveProfile(Colors, SelectedIndex, UserSettings, FetchedProfiles);
             }
         }
+
         public async Task<bool> SaveNewColor(List<Color> Colors, int SelectedIndex, string ProfileName)
         {
             Utilities.Utils.Log("Save button clicked. Saving...");
@@ -323,7 +328,6 @@ namespace ValorantCC
                 Stringsetting profileName = UserSettings.stringSettings.FirstOrDefault(setting => setting.settingEnum == "EAresStringSettingName::CrosshairProfileName");
                 UserSettings = CrosshairMain.ChangeActiveProfile(Colors, SelectedIndex, UserSettings, FetchedProfiles);
                 profileName.value = ProfileName;
-
             }
             if (await putUserSettings(UserSettings))
             {

@@ -11,6 +11,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using ValorantCC.src.Crosshair;
 using ValorantCC.SubWindow;
+
 namespace ValorantCC
 {
     /// <summary>
@@ -34,6 +35,7 @@ namespace ValorantCC
         private static List<PublicProfile> PublicProfiles = new List<PublicProfile>();
         private bool AlreadyFetching = false;
         private int _offset = 0;
+
         public ProfilesWindow(CrosshairProfile current, API ValCCAPI)
         {
             InitializeComponent();
@@ -47,9 +49,11 @@ namespace ValorantCC
         {
             LoadingPlaceHolder.Visibility = Visibility.Visible;
             fetchErrorTxt.Visibility = Visibility.Collapsed;
+
             try
             {
                 bool fetchSucc = await InitialFetch();
+
                 if (!fetchSucc) fetchErrorTxt.Visibility = Visibility.Visible;
                 else
                 {
@@ -61,6 +65,7 @@ namespace ValorantCC
             {
                 Utilities.Utils.Log(ex.StackTrace.ToString());
             }
+
             LoadingPlaceHolder.Visibility = Visibility.Collapsed;
         }
 
@@ -142,6 +147,7 @@ namespace ValorantCC
             }
             return true;
         }
+
         private async void btnSearchCode_Click(object sender, RoutedEventArgs e)
         {
             SearchButtonPressed = true;
@@ -207,6 +213,7 @@ namespace ValorantCC
         {
             Close();
         }
+
         private void MinimizeClick(object sender, RoutedEventArgs e)
         {
             WindowState = WindowState.Minimized;
@@ -216,6 +223,7 @@ namespace ValorantCC
         {
             ((Button)sender).Foreground = new SolidColorBrush(Colors.Gray);
         }
+
         private void TabButtonLeave(object sender, MouseEventArgs e)
         {
             ((Button)sender).Foreground = new SolidColorBrush(Colors.White);
@@ -237,9 +245,9 @@ namespace ValorantCC
         private async void ScrollViewer_ScrollChanged(object sender, ScrollChangedEventArgs e)
         {
             var MaxHeight = ScrollContainer.ScrollableHeight;
-            var ScrollPercentage = ((MaxHeight - ScrollContainer.VerticalOffset) / MaxHeight) *100;
-            var MaxScrollPercentage = 12 - .025*_offset;
-            if(MaxScrollPercentage <= 0) MaxScrollPercentage = .5;
+            var ScrollPercentage = ((MaxHeight - ScrollContainer.VerticalOffset) / MaxHeight) * 100;
+            var MaxScrollPercentage = 12 - .025 * _offset;
+            if (MaxScrollPercentage <= 0) MaxScrollPercentage = .5;
             //System.Diagnostics.Trace.WriteLine(ScrollPercentage);
             if (ScrollPercentage < MaxScrollPercentage && !AlreadyFetching)
             {
@@ -267,6 +275,7 @@ namespace ValorantCC
         //For making left click up, so it doesnt make trouble with auto-fetching
         [DllImport("user32.dll", CharSet = CharSet.Auto, CallingConvention = CallingConvention.StdCall)]
         public static extern void mouse_event(uint dwFlags, uint dx, uint dy, uint cButtons, uint dwExtraInfo);
+
         private const int MOUSEEVENTF_LEFTDOWN = 0x02;
         private const int MOUSEEVENTF_LEFTUP = 0x04;
         private const int MOUSEEVENTF_RIGHTDOWN = 0x08;
